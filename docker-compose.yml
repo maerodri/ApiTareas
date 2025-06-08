@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: crehana_task
+      MYSQL_USER: crehana
+      MYSQL_PASSWORD: Crehana2025*
+    ports:
+      - "3306:3306"
+
+  api:
+    build: .
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: mysql+aiomysql://crehana:Crehana2025*@db:3306/crehana_task
+    volumes:
+      - .:/app
