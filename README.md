@@ -121,6 +121,7 @@ pytest
 - Las contraseñas están encriptadas antes de guardarse
 - El proyecto está organizado por capas: **Domain / Infrastructure / Application**
 - Puedes extender este sistema con permisos, testing, etc.
+- Adjunto la collection de postam organizada y utilizada para la ejecucion de pruebas unitarias [Postman](./utilidades/CREHANA.postman_collection.json)
 
 ---
 
