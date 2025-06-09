@@ -7,6 +7,7 @@ app = FastAPI(title="Prueba Técnica para Backend Developer")
 
 app.version = "1.0.0"
 
+
 # Crear las tablas al iniciar la app
 @app.on_event("startup")
 async def startup():

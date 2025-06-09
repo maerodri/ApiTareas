@@ -3,15 +3,18 @@ from sqlalchemy.orm import relationship
 from app.infrastructure.database import Base
 import enum
 
+
 class TaskStatus(str, enum.Enum):
     pending = "pending"
     in_progress = "in_progress"
     done = "done"
 
+
 class TaskPriority(str, enum.Enum):
     low = "low"
     medium = "medium"
     high = "high"
+
 
 class User(Base):
     __tablename__ = "users"
@@ -22,6 +25,7 @@ class User(Base):
 
     tasks = relationship("Task", back_populates="assigned_user")
 
+
 class List(Base):
     __tablename__ = "lists"
 
@@ -29,6 +33,7 @@ class List(Base):
     name = Column(String(100), nullable=False)
 
     tasks = relationship("Task", back_populates="list")
+
 
 class Task(Base):
     __tablename__ = "tasks"

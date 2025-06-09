@@ -2,14 +2,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from app.infrastructure.models import List, Task, User
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy import update, delete, func
 from app.domain.schemas import TaskStatus, TaskPriority
 from passlib.context import CryptContext
 from app.infrastructure import notifications
 
+
 async def get_all_lists(db: AsyncSession):
     result = await db.execute(select(List))
     return result.scalars().all()
+
 
 async def create_list(db: AsyncSession, name: str):
     new_list = List(name=name)
@@ -17,6 +18,7 @@ async def create_list(db: AsyncSession, name: str):
     await db.commit()
     await db.refresh(new_list)
     return new_list
+
 
 async def update_list(db: AsyncSession, list_id: int, name: str):
     result = await db.execute(select(List).where(List.id == list_id))
@@ -28,6 +30,7 @@ async def update_list(db: AsyncSession, list_id: int, name: str):
     await db.refresh(list_obj)
     return list_obj
 
+
 async def delete_list(db: AsyncSession, list_id: int):
     result = await db.execute(select(List).where(List.id == list_id))
     list_obj = result.scalar_one_or_none()
@@ -37,7 +40,10 @@ async def delete_list(db: AsyncSession, list_id: int):
     await db.commit()
     return {"message": f"Lista {list_id} eliminada"}
 
-async def get_all_tasks(db: AsyncSession, status: TaskStatus = None, priority: TaskPriority = None):
+
+async def get_all_tasks(
+    db: AsyncSession, status: TaskStatus = None, priority: TaskPriority = None
+):
     query = select(Task)
     if status:
         query = query.where(Task.status == status)
@@ -45,6 +51,7 @@ async def get_all_tasks(db: AsyncSession, status: TaskStatus = None, priority: T
         query = query.where(Task.priority == priority)
     result = await db.execute(query)
     return result.scalars().all()
+
 
 async def create_task(db: AsyncSession, task_data: dict):
     task = Task(**task_data)
@@ -56,10 +63,12 @@ async def create_task(db: AsyncSession, task_data: dict):
         result = await db.execute(select(User).where(User.id == task.assigned_user_id))
         user = result.scalar_one_or_none()
         if user:
-            notifications.send_task_notification(user.username + "@gmail.com", task.title)
-
+            notifications.send_task_notification(
+                user.username + "@gmail.com", task.title
+            )
 
     return task
+
 
 async def get_task_by_id(db: AsyncSession, task_id: int):
     result = await db.execute(select(Task).where(Task.id == task_id))
@@ -67,6 +76,7 @@ async def get_task_by_id(db: AsyncSession, task_id: int):
     if not task:
         raise NoResultFound
     return task
+
 
 async def update_task(db: AsyncSession, task_id: int, updates: dict):
     task = await get_task_by_id(db, task_id)
@@ -76,13 +86,17 @@ async def update_task(db: AsyncSession, task_id: int, updates: dict):
     await db.refresh(task)
     return task
 
+
 async def delete_task(db: AsyncSession, task_id: int):
     task = await get_task_by_id(db, task_id)
     await db.delete(task)
     await db.commit()
     return {"message": f"Tarea {task_id} eliminada"}
 
-async def get_tasks_by_list_with_stats(db: AsyncSession, list_id: int, status=None, priority=None):
+
+async def get_tasks_by_list_with_stats(
+    db: AsyncSession, list_id: int, status=None, priority=None
+):
     query = select(Task).where(Task.list_id == list_id)
     if status:
         query = query.where(Task.status == status)
@@ -97,14 +111,13 @@ async def get_tasks_by_list_with_stats(db: AsyncSession, list_id: int, status=No
     done = len([task for task in tasks if task.status == TaskStatus.done])
     completion = (done / total * 100) if total > 0 else 0
 
-    return {
-        "tasks": tasks,
-        "completion": round(completion, 2)
-    }
+    return {"tasks": tasks, "completion": round(completion, 2)}
+
 
 async def get_all_users(db: AsyncSession):
     result = await db.execute(select(User))
     return result.scalars().all()
+
 
 async def create_user(db: AsyncSession, username: str, password: str):
     hashed = hash_password(password)
@@ -114,10 +127,13 @@ async def create_user(db: AsyncSession, username: str, password: str):
     await db.refresh(user)
     return user
 
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
+
 
 async def get_user_by_id(db: AsyncSession, user_id: int):
     result = await db.execute(select(User).where(User.id == user_id))
@@ -125,6 +141,7 @@ async def get_user_by_id(db: AsyncSession, user_id: int):
     if not user:
         raise NoResultFound
     return user
+
 
 async def update_user(db: AsyncSession, user_id: int, updates: dict):
     user = await get_user_by_id(db, user_id)
@@ -135,6 +152,7 @@ async def update_user(db: AsyncSession, user_id: int, updates: dict):
     await db.commit()
     await db.refresh(user)
     return user
+
 
 async def delete_user(db: AsyncSession, user_id: int):
     user = await get_user_by_id(db, user_id)

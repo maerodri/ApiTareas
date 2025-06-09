@@ -1,6 +1,14 @@
 # Prueba Tecnica Crehana
 
-Este proyecto es una API REST construida con **FastAPI**, que permite gestionar usuarios, listas de tareas y tareas individuales, incluyendo autenticación con **JWT**, encriptación de contraseñas y simulación de notificaciones por correo.
+Este proyecto es una API REST construida con **FastAPI**, que permite gestionar usuarios, listas de tareas y tareas individuales, incluyendo autenticación con **JWT**, encriptación de contraseñas y simulación de notificaciones por correo, el proyecto se entrega a traves de un repositorio publico denominado APITAREAS, este contiene los archivos necesarios para ejecutar la api y/o proyecto en una maquina con docker previamente instalado.
+
+# Contenerizacion
+
+El objetivo del docker es crear 2 contenedores dentro de la carpeta base, 1 encargado de la base de datos en este caso MySql y el otro la api desarrollada en fastApi, adjuntaremos evidencias de su ejecucion.
+
+# Secuencia de la Api
+
+La tarea inicial de la api apenas inicia su ejecucion, es crear las tablas de la base de datos, el usuario para la gestion de las mismas es configurado desde el dockerFile. Una vez ejecutada la aplicacion se podran acceder a los endPoints descritos en el Apartado de [Endpoint Principales.](#endpoints-principales)
 
 ---
 
@@ -24,14 +32,14 @@ Este proyecto es una API REST construida con **FastAPI**, que permite gestionar 
 .
 ├── domain/                 # Esquemas Pydantic (DTOs)
 │   └── schemas.py
+├── application/            # Endpoints organizados
+│     ├── lists.py
+│     ├── tasks.py
+│     └── users.py
 ├── infrastructure/
 │   ├── models.py           # Modelos SQLAlchemy
 │   ├── database.py         # Conexión a MySQL
 │   ├── repositories.py     # Lógica de acceso a datos
-│   ├── routers/            # Endpoints organizados
-│   │   ├── lists.py
-│   │   ├── tasks.py
-│   │   └── users.py
 │   ├── auth.py             # Generación y verificación de JWT
 │   └── notifications.py    # Simulación de notificaciones
 ├── main.py                 # Punto de entrada FastAPI
@@ -75,7 +83,8 @@ Este proyecto es una API REST construida con **FastAPI**, que permite gestionar 
 ## 🔧 Variables de entorno (.env)
 
 ```
-DATABASE_URL=mysql+aiomysql://user:password@localhost:3306/todo_db
+DATABASE_URL=mysql+aiomysql://user:password@localhost:3306/todo_db 
+SECRET_KEY = "secret-****"
 ```
 
 ---
@@ -87,6 +96,8 @@ DATABASE_URL=mysql+aiomysql://user:password@localhost:3306/todo_db
 ```bash
 uvicorn main:app --reload
 ```
+### Evidencia:
+![Local](./img/local.png)
 
 ### Docker:
 
@@ -94,12 +105,21 @@ uvicorn main:app --reload
 docker compose up --build
 ```
 
+### Evidencia:
+![Docker](./img/docker.png)
+
+## ▶️ Ejecutar las pruebas
+
+```bash
+pytest
+```
+
 ---
 
 ## 📚 Notas
 
 - Las contraseñas están encriptadas antes de guardarse
-- El proyecto está organizado por capas: **Domain / Infrastructure**
+- El proyecto está organizado por capas: **Domain / Infrastructure / Application**
 - Puedes extender este sistema con permisos, testing, etc.
 
 ---
